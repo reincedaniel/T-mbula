@@ -81,9 +81,15 @@
         </q-expansion-item>
       </q-card-section>
       <q-card-actions align="right">
-        <q-btn v-if="ratingModel" outline no-caps dense label="Confirmar" color="blue" v-close-popup />
+        <q-btn v-if="ratingModel" :disable="!mapStore.isLogged" outline no-caps dense label="Confirmar"
+          :color="!mapStore.isLogged ? 'grey' : 'blue'" v-close-popup />
         <q-btn outline no-caps dense label="Cancelar" color="red" v-close-popup />
       </q-card-actions>
+
+      <div v-if="!mapStore.isLogged" class="row flex flex-center text-caption text-red text-bold"> <span
+          class="text-italic">!!!Faça Login na
+          plataforma</span>
+      </div>
     </q-card>
   </q-dialog>
 </template>
