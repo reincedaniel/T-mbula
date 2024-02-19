@@ -1,6 +1,6 @@
-# Tâmbula app (tâmbula)
+# Tâmbula app (tambula)
 
-tâmbula app
+tambula app
 
 ## Install the dependencies
 
