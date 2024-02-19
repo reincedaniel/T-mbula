@@ -81,8 +81,8 @@
         </q-expansion-item>
       </q-card-section>
       <q-card-actions align="right">
-        <q-btn v-if="ratingModel" :disable="!mapStore.isLogged" outline no-caps dense label="Confirmar"
-          :color="!mapStore.isLogged ? 'grey' : 'blue'" v-close-popup />
+        <q-btn @click="sendClassifier()" v-if="ratingModel" :disable="!mapStore.isLogged" outline no-caps dense
+          label="Confirmar" :color="!mapStore.isLogged ? 'grey' : 'blue'" v-close-popup />
         <q-btn outline no-caps dense label="Cancelar" color="red" v-close-popup />
       </q-card-actions>
 
@@ -96,10 +96,17 @@
 
 
 <script>
+
+import { GeoPoint, getFirestore, onSnapshot, collection, doc, deleteDoc, setDoc, addDoc, orderBy, query } from 'firebase/firestore'
+
 import useMapStore from 'src/stores/MapStore'
 export default {
   data() {
     return {
+      userLogged: null,
+      db: getFirestore(this.$firebaseApp),
+      lat: null,
+      lng: null,
       comment: null,
       expanded: false,
       activeLocation: null,
@@ -114,6 +121,22 @@ export default {
     }
   },
   methods: {
+    sendClassifier() {
+
+      addDoc(collection(this.db, 'placesVisited'),
+        {
+          date: Date.now(),
+          address: this.activeLocation,
+          comment: this.comment,
+          fullName: this.userLogged?.displayName,
+          lat: this.lat,
+          lng: this.lng,
+          raw: 'test',
+          userId: this.userLogged?.uid,
+          geoPoint: new GeoPoint(this.lat, this.lng),
+        })
+
+    },
     async getMyLocation() {
       this.isLoading = true
       if (navigator.geolocation) {
@@ -123,11 +146,14 @@ export default {
 
             this.showUserLocationOnTheMap(position.coords.latitude, position.coords.longitude)
 
+
             this.isLoading = false
             if (res && res.code === 200) {
               this.address = res.data
               this.showClassifier = true
               this.activeLocation = res.data
+              this.lat = position.coords.latitude
+              this.lng = position.coords.longitude
             }
             else if (res && res.code === 400) {
               this.$q.notify({
@@ -194,7 +220,9 @@ export default {
   },
   mounted() {
     /* this.$refs.autocomplete.getNativeElement() */
-
+    if (this.mapStore.isLogged) {
+      this.userLogged = JSON.parse(localStorage.getItem("userLogged") || {})
+    }
     let autocomplete = new google.maps.places.Autocomplete(
       this.$refs["autocomplete"], {
       bounds: new google.maps.LatLngBounds(
@@ -203,12 +231,15 @@ export default {
     }
     );
 
+
     autocomplete.addListener("place_changed", () => {
       let place = autocomplete.getPlace()
       this.address = place.formatted_address
       this.activeLocation = place.formatted_address
 
       this.showClassifier = true
+      this.lat = place.geometry.location.lat()
+      this.lng = place.geometry.location.lng()
       this.showUserLocationOnTheMap(place.geometry.location.lat(), place.geometry.location.lng())
 
     })
