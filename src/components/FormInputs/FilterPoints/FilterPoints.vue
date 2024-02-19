@@ -54,7 +54,7 @@
   </div>
 
   <q-dialog v-model="classifier" persistent>
-    <q-card class="q-pa-sm poppins-regular" style="width: 350px">
+    <q-card class="q-pa-sm poppins-regular" style="width: 450px">
       <q-card-section class="row flex flex-center">
         <q-avatar icon="hotel_class" color="pink" text-color="white" />
       </q-card-section>
@@ -64,13 +64,24 @@
       <div class="row flex flex-center poppins-semibold text-center">
         <span class="q-ml-sm">{{ address }}</span>
       </div>
+
       <q-card-section class="row  flex flex-center">
         <div class="q-gutter-y-md ">
           <q-rating v-model="ratingModel" size="3.5em" color="pink" icon="star_border" icon-selected="star" />
         </div>
       </q-card-section>
-
+      <q-card-section class="row  col">
+        <q-expansion-item class="col bg-grey-3" v-model="expanded" icon="eva-message-circle-outline"
+          label="Adicionar Comentários" caption="ex.: Amei visitar o local">
+          <q-card>
+            <q-card-section>
+              <q-input rounded dense v-model="comment" label="Comentário" outlined autogrow />
+            </q-card-section>
+          </q-card>
+        </q-expansion-item>
+      </q-card-section>
       <q-card-actions align="right">
+        <q-btn v-if="ratingModel" outline no-caps dense label="Confirmar" color="blue" v-close-popup />
         <q-btn outline no-caps dense label="Cancelar" color="red" v-close-popup />
       </q-card-actions>
     </q-card>
@@ -83,6 +94,8 @@ import useMapStore from 'src/stores/MapStore'
 export default {
   data() {
     return {
+      comment: null,
+      expanded: false,
       activeLocation: null,
       showClassifier: false,
       ratingModel: 0,
