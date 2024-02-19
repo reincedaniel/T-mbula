@@ -10,7 +10,7 @@
     "format": "prettier --write \"**/*.{js,vue,scss,html,md,json}\" --ignore-path .gitignore",
     "test": "echo \"No test specified\" && exit 0",
     "dev": "quasar dev",
-    "build": "quasar build"
+    "build": "quasar build -m pwa"
   },
   "dependencies": {
     "@fawmi/vue-google-maps": "^0.9.79",

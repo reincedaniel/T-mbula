@@ -94,6 +94,7 @@ const getMyLocation = () => {
         }
       },
       error => {
+        isLoading.value = false
         console.log(error.message)
         $q.notify({
           position: 'top',
@@ -107,6 +108,7 @@ const getMyLocation = () => {
       }
     )
   } else {
+    isLoading.value = false
     console.log("Your browser does not support geolocation API")
     $q.notify({
       position: 'top',
