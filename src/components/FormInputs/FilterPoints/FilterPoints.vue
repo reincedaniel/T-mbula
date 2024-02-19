@@ -83,6 +83,7 @@ import useMapStore from 'src/stores/MapStore'
 export default {
   data() {
     return {
+      activeLocation: null,
       showClassifier: false,
       ratingModel: 0,
       classifier: false,
@@ -106,6 +107,8 @@ export default {
             this.isLoading = false
             if (res && res.code === 200) {
               this.address = res.data
+              this.showClassifier = true
+              this.activeLocation = res.data
             }
             else if (res && res.code === 400) {
               this.$q.notify({
@@ -184,6 +187,7 @@ export default {
     autocomplete.addListener("place_changed", () => {
       let place = autocomplete.getPlace()
       this.address = place.formatted_address
+      this.activeLocation = place.formatted_address
 
       this.showClassifier = true
       this.showUserLocationOnTheMap(place.geometry.location.lat(), place.geometry.location.lng())
