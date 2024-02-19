@@ -22,5 +22,4 @@ const errorCallback = (error) => {
 };
 
 navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
-console.log("centerCoords: ", centerCoords)
 </script>

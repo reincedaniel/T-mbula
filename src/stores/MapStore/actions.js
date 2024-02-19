@@ -29,7 +29,28 @@ export default {
         }
       })
       .catch((err) => {
-        console.log("Catch:: ", err);
+        result = { code: 401, data: "Erro ao realizar esta operação." };
+      });
+
+    return result;
+  },
+  async getAutocompleteLibrary(lat, long) {
+    let result = null;
+    await axios
+      .get(
+        `${process.env.VITE_GOOGLE_API}/maps/api/js?libraries=places&key=AIzaSyD7YVBILJ10vi7GEiD7E8zyYOAFfTxGbXI`
+      )
+      .then((res) => {
+        if (res.data.error_message) {
+          result = {
+            code: 400,
+            data: "Não foi possível encontrar a sua localização.",
+          };
+        } else {
+          result = { code: 200, data: res.data.results[0].formatted_address };
+        }
+      })
+      .catch((err) => {
         result = { code: 401, data: "Erro ao realizar esta operação." };
       });
 
