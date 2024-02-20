@@ -121,20 +121,45 @@ export default {
     }
   },
   methods: {
-    sendClassifier() {
+    async sendClassifier() {
+      const dataObject = {
+        date: Date.now(),
+        address: this.activeLocation,
+        comment: this.comment,
+        fullName: this.userLogged?.displayName,
+        lat: this.lat,
+        lng: this.lng,
+        rate: this.ratingModel,
+        userId: this.userLogged?.uid,
+        geoPoint: new GeoPoint(this.lat, this.lng),
+      }
 
-      addDoc(collection(this.db, 'placesVisited'),
-        {
-          date: Date.now(),
-          address: this.activeLocation,
-          comment: this.comment,
-          fullName: this.userLogged?.displayName,
-          lat: this.lat,
-          lng: this.lng,
-          raw: 'test',
-          userId: this.userLogged?.uid,
-          geoPoint: new GeoPoint(this.lat, this.lng),
-        })
+      console.log("dataObject::>  ", dataObject)
+      console.log("this.db::>  ", this.db)
+
+      try {
+        await addDoc(collection(this.db, 'placesVisited'), dataObject)
+
+        this.$q.notify({
+          position: 'bottom',
+          progress: true,
+          html: true,
+          message: `Avaliação enviada!`,
+          color: 'green',
+          multiLine: true,
+          icon: 'done'
+        });
+      } catch (error) {
+        this.$q.notify({
+          position: 'bottom',
+          progress: true,
+          html: true,
+          message: `Não foi possível fazer a avaliação!`,
+          color: 'orange',
+          multiLine: true,
+          icon: 'warning'
+        });
+      }
 
     },
     async getMyLocation() {

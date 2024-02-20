@@ -190,9 +190,29 @@ export default {
           this.mapStore.isLogged = true
           //  location.reload()
           this.userLogged = JSON.parse(localStorage.getItem("userLogged") || {})
+
+          this.$q.notify({
+            position: 'bottom',
+            progress: true,
+            html: true,
+            message: `Operação realizada com sucesso!`,
+            color: 'green',
+            multiLine: true,
+            icon: 'done'
+          });
         })
         .catch((error) => {
-          console.log("Ocorreu um erro")
+          console.log("Ocorreu um erro: ", error)
+
+          this.$q.notify({
+            position: 'bottom',
+            progress: true,
+            html: true,
+            message: `Não foi possível fazer o login!`,
+            color: 'orange',
+            multiLine: true,
+            icon: 'warning'
+          });
 
         })
     }
