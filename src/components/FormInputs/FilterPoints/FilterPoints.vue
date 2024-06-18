@@ -51,6 +51,7 @@
 
       </q-btn>
     </div>
+
   </div>
 
   <q-dialog v-model="classifier" persistent>
@@ -81,9 +82,10 @@
         </q-expansion-item>
       </q-card-section>
       <q-card-actions align="right">
-        <q-btn @click="sendClassifier()" v-if="ratingModel" :disable="!mapStore.isLogged" outline no-caps dense
-          label="Confirmar" :color="!mapStore.isLogged ? 'grey' : 'blue'" v-close-popup />
         <q-btn outline no-caps dense label="Cancelar" color="red" v-close-popup />
+
+        <q-btn @click="sendClassifier()" v-if="ratingModel" :disable="!mapStore.isLogged" no-caps dense
+          label="Confirmar" :color="!mapStore.isLogged ? 'grey' : 'blue'" v-close-popup />
       </q-card-actions>
 
       <div v-if="!mapStore.isLogged" class="row flex flex-center text-caption text-red text-bold"> <span
@@ -117,6 +119,7 @@ export default {
       address: null,
       mapStore: useMapStore(),
       isLoading: false,
+      pontosDeInteresse: [],
       defaultCoords: { lat: 40.20564, lng: -8.41955 }
     }
   },
@@ -149,6 +152,9 @@ export default {
           multiLine: true,
           icon: 'done'
         });
+
+        this.comment = null
+        this.ratingModel = null
       } catch (error) {
         this.$q.notify({
           position: 'bottom',
@@ -232,7 +238,7 @@ export default {
     showUserLocationOnTheMap(lat, lng) {
       //
       let map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 15,
+        zoom: 18,
         center: new google.maps.LatLng(lat, lng),
         mapTypeId: google.maps.MapTypeId.ROADMAP
       })
@@ -241,6 +247,32 @@ export default {
         position: new google.maps.LatLng(lat, lng),
         map
       })
+
+      const servico = new google.maps.places.PlacesService(map);
+      servico.nearbySearch({
+        location: { lat: lat, lng: lng },
+        radius: 1500,
+        type: ['point_of_interest']
+      }, (resultados, status) => {
+        if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+          this.mapStore.poi = resultados;
+          resultados.forEach(poi => {
+            const marcador = new window.google.maps.Marker({
+              position: poi.geometry.location,
+              map: map
+            });
+            marcador.addListener('click', () => {
+              if (infoWindow) {
+                infoWindow.close();
+              }
+              infoWindow = new window.google.maps.InfoWindow({
+                content: `<h3>${poi.name}</h3><p>${poi.vicinity}</p>`
+              });
+              infoWindow.open(map, marcador);
+            });
+          });
+        }
+      });
     }
   },
   mounted() {
@@ -268,6 +300,7 @@ export default {
       this.showUserLocationOnTheMap(place.geometry.location.lat(), place.geometry.location.lng())
 
     })
+    this.getMyLocation()
   }
 }
 </script>

@@ -15,14 +15,18 @@
   "dependencies": {
     "@fawmi/vue-google-maps": "^0.9.79",
     "@quasar/extras": "^1.16.4",
+    "@vueuse/core": "^10.9.0",
     "axios": "^1.2.1",
     "firebase": "^10.8.0",
     "pinia": "^2.0.11",
+    "pouchdb": "^8.0.1",
     "quasar": "^2.8.0",
+    "uuid": "^9.0.1",
     "vue": "^3.4.18",
     "vue-i18n": "^9.0.0",
     "vue-router": "^4.0.12",
-    "vue3-google-map": "^0.19.0"
+    "vue3-google-map": "^0.19.0",
+    "vue3-google-maps": "^0.0.1"
   },
   "devDependencies": {
     "@intlify/vite-plugin-vue-i18n": "^3.3.1",
