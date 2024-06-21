@@ -1,30 +1,74 @@
 <template>
   <div class="column shadow-6 q-py-lg poppins-semibold">
-
-    <div class="row q-mx-sm q-my-md"><label
-        class="q-field row no-wrap items-start q-field--outlined q-input q-field--rounded  q-field--dense  col"
+    <div class="" v-if="false">
+      <span
+        >#stateMapStore:
+        <pre>{{ stateMapStore && stateMapStore.address }}</pre>
+      </span>
+      <span>#EstimatedTime: {{ estimatedTime }}</span>
+      <span>MyPosition: {{ myPosition }}</span>
+      <span>FinalPosition: {{ mapStore.finalPosition }}</span>
+      <q-btn color="red" icon="check" label="1" @click="getDistance()" />
+    </div>
+    <div class="row q-mx-sm q-my-md">
+      <label
+        class="q-field row no-wrap items-start q-field--outlined q-input q-field--rounded q-field--dense col"
         :class="{ 'q-field--focused q-field--highlighted': magic_flag }"
-        for="f_684a646d-1760-483c-912c-af25da30ef9e"><!---->
+        for="f_684a646d-1760-483c-912c-af25da30ef9e"
+        ><!---->
         <div class="q-field__inner relative-position col self-stretch">
-          <div class="q-field__control relative-position row no-wrap text-blue" tabindex="-1">
-            <div class="q-field__control-container col relative-position row no-wrap q-anchor--skip"><input
-                @focus="magic_flag = true" @blur="magic_flag = false" ref="autocomplete"
-                class="q-field__native  pac-target-input" autofocus tabindex="0" v-model="address" type="text"
-                autocomplete="off">
+          <div
+            class="q-field__control relative-position row no-wrap text-blue"
+            tabindex="-1"
+          >
+            <div
+              class="q-field__control-container col relative-position row no-wrap q-anchor--skip"
+            >
+              <input
+                @focus="magic_flag = true"
+                @blur="magic_flag = false"
+                ref="autocomplete"
+                class="q-field__native pac-target-input"
+                autofocus
+                tabindex="0"
+                v-model="address"
+                type="text"
+                autocomplete="off"
+              />
             </div>
-            <div class="q-field__append q-field__marginal row no-wrap items-center q-anchor--skip">
-
-              <q-btn v-if="address" @click="address = null" flat round color="grey-6" dense icon="format_clear" />
+            <div
+              class="q-field__append q-field__marginal row no-wrap items-center q-anchor--skip"
+            >
+              <q-btn
+                v-if="address"
+                @click="address = null"
+                flat
+                round
+                color="grey-6"
+                dense
+                icon="format_clear"
+              />
             </div>
-          </div><!---->
+          </div>
+          <!---->
         </div>
-        <div class="q-field__after q-field__marginal row no-wrap items-center"><q-btn :loading="isLoading"
-            @click="getMyLocation()" color="pink-7" round dense flat icon="gps_fixed">
+        <div class="q-field__after q-field__marginal row no-wrap items-center">
+          <q-btn
+            :loading="isLoading"
+            @click="getMyLocation()"
+            color="pink-7"
+            round
+            dense
+            flat
+            icon="gps_fixed"
+          >
             <template v-slot:loading>
               <q-spinner-hourglass class="on-left" />
             </template>
-          </q-btn></div>
-      </label></div>
+          </q-btn>
+        </div>
+      </label>
+    </div>
     <!-- <div class="row q-mx-sm q-my-md">
       <q-input v-model="address" rounded ref="autocomplete" clearable clear-icon="format_clear" id="autocompletex"
         class="col" outlined color="blue" label="Localização" dense>
@@ -38,20 +82,34 @@
         </template>
       </q-input>
     </div> -->
-    <div class="row q-mx-sm"> <q-btn :loading="isLoading" outline rounded color="blue-10" @click="getMyLocation()"
-        icon="travel_explore" no-caps>
+    <div class="row q-mx-sm">
+      <q-btn
+        :loading="isLoading"
+        outline
+        rounded
+        color="blue-10"
+        @click="getMyLocation()"
+        icon="travel_explore"
+        no-caps
+      >
         Encontrar
 
         <template v-slot:loading>
-          <q-spinner-hourglass class="on-left" />
-        </template></q-btn>
-      <q-btn v-if="address && showClassifier" rounded class="q-ml-md" color="pink" outline @click="classifier = true"
-        icon="hotel_class" no-caps>
+          <q-spinner-hourglass class="on-left" /> </template
+      ></q-btn>
+      <q-btn
+        v-if="address && showClassifier"
+        rounded
+        class="q-ml-md"
+        color="pink"
+        outline
+        @click="classifier = true"
+        icon="hotel_class"
+        no-caps
+      >
         Avaliar
-
       </q-btn>
     </div>
-
   </div>
 
   <q-dialog v-model="classifier" persistent>
@@ -66,46 +124,94 @@
         <span class="q-ml-sm">{{ address }}</span>
       </div>
 
-      <q-card-section class="row  flex flex-center">
-        <div class="q-gutter-y-md ">
-          <q-rating v-model="ratingModel" size="3.5em" color="pink" icon="star_border" icon-selected="star" />
+      <q-card-section class="row flex flex-center">
+        <div class="q-gutter-y-md">
+          <q-rating
+            v-model="ratingModel"
+            size="3.5em"
+            color="pink"
+            icon="star_border"
+            icon-selected="star"
+          />
         </div>
       </q-card-section>
-      <q-card-section class="row  col">
-        <q-expansion-item class="col bg-grey-3" v-model="expanded" icon="eva-message-circle-outline"
-          label="Adicionar Comentários" caption="ex.: Amei visitar o local">
+      <q-card-section class="row col">
+        <q-expansion-item
+          class="col bg-grey-3"
+          v-model="expanded"
+          icon="eva-message-circle-outline"
+          label="Adicionar Comentários"
+          caption="ex.: Amei visitar o local"
+        >
           <q-card>
             <q-card-section>
-              <q-input rounded dense v-model="comment" label="Comentário" outlined autogrow />
+              <q-input
+                rounded
+                dense
+                v-model="comment"
+                label="Comentário"
+                outlined
+                autogrow
+              />
             </q-card-section>
           </q-card>
         </q-expansion-item>
       </q-card-section>
       <q-card-actions align="right">
-        <q-btn outline no-caps dense label="Cancelar" color="red" v-close-popup />
+        <q-btn
+          outline
+          no-caps
+          dense
+          label="Cancelar"
+          color="red"
+          v-close-popup
+        />
 
-        <q-btn @click="sendClassifier()" v-if="ratingModel" :disable="!mapStore.isLogged" no-caps dense
-          label="Confirmar" :color="!mapStore.isLogged ? 'grey' : 'blue'" v-close-popup />
+        <q-btn
+          @click="sendClassifier()"
+          v-if="ratingModel"
+          :disable="!mapStore.isLogged"
+          no-caps
+          dense
+          label="Confirmar"
+          :color="!mapStore.isLogged ? 'grey' : 'blue'"
+          v-close-popup
+        />
       </q-card-actions>
 
-      <div v-if="!mapStore.isLogged" class="row flex flex-center text-caption text-red text-bold"> <span
-          class="text-italic">!!!Faça Login na
-          plataforma</span>
+      <div
+        v-if="!mapStore.isLogged"
+        class="row flex flex-center text-caption text-red text-bold"
+      >
+        <span class="text-italic">!!!Faça Login na plataforma</span>
       </div>
     </q-card>
   </q-dialog>
 </template>
 
-
 <script>
+import {
+  GeoPoint,
+  getFirestore,
+  onSnapshot,
+  collection,
+  doc,
+  deleteDoc,
+  setDoc,
+  addDoc,
+  orderBy,
+  query,
+} from "firebase/firestore";
 
-import { GeoPoint, getFirestore, onSnapshot, collection, doc, deleteDoc, setDoc, addDoc, orderBy, query } from 'firebase/firestore'
+import useMapStore from "src/stores/MapStore";
+import { storeToRefs } from "pinia";
+import hermes from "src/composables/hermes";
 
-import useMapStore from 'src/stores/MapStore'
 export default {
   data() {
     return {
       userLogged: null,
+      estimatedTime: "",
       db: getFirestore(this.$firebaseApp),
       lat: null,
       lng: null,
@@ -116,14 +222,22 @@ export default {
       ratingModel: 0,
       classifier: false,
       magic_flag: false,
-      address: null,
+      address: storeToRefs(useMapStore()).address,
       mapStore: useMapStore(),
+      stateMapStore: storeToRefs(useMapStore()),
       isLoading: false,
+      myPosition: {
+        lat: 0,
+        lng: 0,
+      },
       pontosDeInteresse: [],
-      defaultCoords: { lat: 40.20564, lng: -8.41955 }
-    }
+      defaultCoords: { lat: 40.20564, lng: -8.41955 },
+    };
   },
   methods: {
+    alertx(val) {
+      alert(val);
+    },
     async sendClassifier() {
       const dataObject = {
         date: Date.now(),
@@ -135,174 +249,227 @@ export default {
         rate: this.ratingModel,
         userId: this.userLogged?.uid,
         geoPoint: new GeoPoint(this.lat, this.lng),
-      }
+      };
 
-      console.log("dataObject::>  ", dataObject)
-      console.log("this.db::>  ", this.db)
+      console.log("dataObject::>  ", dataObject);
+      console.log("this.db::>  ", this.db);
 
       try {
-        await addDoc(collection(this.db, 'placesVisited'), dataObject)
+        await addDoc(collection(this.db, "placesVisited"), dataObject);
 
         this.$q.notify({
-          position: 'bottom',
+          position: "bottom",
           progress: true,
           html: true,
           message: `Avaliação enviada!`,
-          color: 'green',
+          color: "green",
           multiLine: true,
-          icon: 'done'
+          icon: "done",
         });
 
-        this.comment = null
-        this.ratingModel = null
+        this.comment = null;
+        this.ratingModel = null;
       } catch (error) {
         this.$q.notify({
-          position: 'bottom',
+          position: "bottom",
           progress: true,
           html: true,
           message: `Não foi possível fazer a avaliação!`,
-          color: 'orange',
+          color: "orange",
           multiLine: true,
-          icon: 'warning'
+          icon: "warning",
         });
       }
-
     },
     async getMyLocation() {
-      this.isLoading = true
+      this.isLoading = true;
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-          async position => {
-            const res = await this.mapStore.getAddressFromLatLong(position.coords.latitude, position.coords.longitude)
+          async (position) => {
+            const res = await this.mapStore.getAddressFromLatLong(
+              position.coords.latitude,
+              position.coords.longitude
+            );
+            this.myPosition.lat = position.coords.latitude;
+            this.myPosition.lng = position.coords.longitude;
 
-            this.showUserLocationOnTheMap(position.coords.latitude, position.coords.longitude)
+            this.stateMapStore.myPosition.lat = position.coords.latitude;
+            this.stateMapStore.myPosition.lng = position.coords.longitude;
 
+            this.showUserLocationOnTheMap(
+              position.coords.latitude,
+              position.coords.longitude
+            );
 
-            this.isLoading = false
+            this.isLoading = false;
             if (res && res.code === 200) {
-              this.address = res.data
-              this.showClassifier = true
-              this.activeLocation = res.data
-              this.lat = position.coords.latitude
-              this.lng = position.coords.longitude
-            }
-            else if (res && res.code === 400) {
+              this.address = res.data;
+              this.showClassifier = true;
+              this.activeLocation = res.data;
+              this.lat = position.coords.latitude;
+              this.lng = position.coords.longitude;
+            } else if (res && res.code === 400) {
               this.$q.notify({
-                position: 'bottom',
+                position: "bottom",
                 progress: true,
                 html: true,
                 message: `Erro ao validar a localização.`,
-                color: 'orange',
+                color: "orange",
                 multiLine: true,
-                icon: 'warning'
+                icon: "warning",
               });
             } else {
               this.$q.notify({
-                position: 'bottom',
+                position: "bottom",
                 progress: true,
                 html: true,
                 message: `Error do servidor.`,
-                color: 'red',
+                color: "red",
                 multiLine: true,
-                icon: 'error'
+                icon: "error",
               });
             }
           },
-          error => {
-            this.isLoading = false
+          (error) => {
+            this.isLoading = false;
             this.$q.notify({
-              position: 'bottom',
+              position: "bottom",
               progress: true,
               html: true,
               message: `Localização bloqueada`,
-              color: 'red',
+              color: "red",
               multiLine: true,
-              icon: 'error'
+              icon: "error",
             });
           }
-        )
+        );
       } else {
-        this.isLoading = false
+        this.isLoading = false;
         this.$q.notify({
-          position: 'bottom',
+          position: "bottom",
           progress: true,
           html: true,
           message: `O navegador não suporta Geolocalização.`,
-          color: 'red',
+          color: "red",
           multiLine: true,
-          icon: 'warning'
+          icon: "warning",
         });
       }
-
     },
+    getDistance() {
+      hermes.send("change-updates-1", { getDistance: "Outras Coisas" }, "all");
+    },
+
     showUserLocationOnTheMap(lat, lng) {
       //
       let map = new google.maps.Map(document.getElementById("map"), {
         zoom: 18,
         center: new google.maps.LatLng(lat, lng),
-        mapTypeId: google.maps.MapTypeId.ROADMAP
-      })
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+      });
 
       new google.maps.Marker({
         position: new google.maps.LatLng(lat, lng),
-        map
-      })
-
-      const servico = new google.maps.places.PlacesService(map);
-      servico.nearbySearch({
-        location: { lat: lat, lng: lng },
-        radius: 1500,
-        type: ['point_of_interest']
-      }, (resultados, status) => {
-        if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-          this.mapStore.poi = resultados;
-          resultados.forEach(poi => {
-            const marcador = new window.google.maps.Marker({
-              position: poi.geometry.location,
-              map: map
-            });
-            marcador.addListener('click', () => {
-              if (infoWindow) {
-                infoWindow.close();
-              }
-              infoWindow = new window.google.maps.InfoWindow({
-                content: `<h3>${poi.name}</h3><p>${poi.vicinity}</p>`
-              });
-              infoWindow.open(map, marcador);
-            });
-          });
-        }
+        map,
       });
-    }
+
+      const service = new google.maps.places.PlacesService(map);
+      service.nearbySearch(
+        {
+          location: { lat: lat, lng: lng },
+          radius: 5000,
+          type: ["point_of_interest"],
+        },
+        (results, status) => {
+          if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+            this.mapStore.poi = results;
+            results.forEach((poi) => {
+              const marker = new window.google.maps.Marker({
+                position: poi.geometry.location,
+                map: map,
+              });
+              marker.addListener("click", () => {
+                if (infoWindow) {
+                  infoWindow.close();
+                }
+                infoWindow = new window.google.maps.InfoWindow({
+                  content: `<h3>${poi.name}</h3><p>${poi.vicinity}</p>`,
+                });
+                infoWindow.open(map, marker);
+              });
+            });
+          }
+        }
+      );
+
+      hermes.on("change-updates-1", (logs) => {
+        const directionsService = new google.maps.DirectionsService();
+
+        const directionsRenderer = new google.maps.DirectionsRenderer();
+
+        const origin = `${this.myPosition.lat},${this.myPosition.lng}`;
+        const destination = `${this.mapStore.finalPosition.lat},${this.mapStore.finalPosition.lng}`;
+
+        console.log("origin: ", origin);
+        console.log("destination: ", destination);
+
+        directionsService.route(
+          {
+            origin: origin,
+            destination: destination,
+            travelMode: "TRANSIT",
+          },
+          (directionsResult, directionsStatus) => {
+            if (directionsStatus === "OK") {
+              directionsRenderer.setDirections(directionsResult);
+              directionsRenderer.setMap(map);
+
+              const route = directionsResult.routes[0];
+              const leg = route.legs[0];
+              this.estimatedTime = {
+                time: leg.duration.text,
+                distance: leg.distance.text,
+              };
+            }
+          }
+        );
+      });
+    },
   },
   mounted() {
-    /* this.$refs.autocomplete.getNativeElement() */
     if (this.mapStore.isLogged) {
-      this.userLogged = JSON.parse(localStorage.getItem("userLogged") || {})
+      this.userLogged = JSON.parse(localStorage.getItem("userLogged") || {});
     }
     let autocomplete = new google.maps.places.Autocomplete(
-      this.$refs["autocomplete"], {
-      bounds: new google.maps.LatLngBounds(
-        new google.maps.LatLng(this.defaultCoords.lat, this.defaultCoords.lng)
-      )
-    }
+      this.$refs["autocomplete"],
+      {
+        bounds: new google.maps.LatLngBounds(
+          new google.maps.LatLng(this.defaultCoords.lat, this.defaultCoords.lng)
+        ),
+      }
     );
 
+    autocomplete.addListener("place_changed", async () => {
+      let place = autocomplete.getPlace();
+      this.address = place.formatted_address;
+      this.activeLocation = place.formatted_address;
 
-    autocomplete.addListener("place_changed", () => {
-      let place = autocomplete.getPlace()
-      this.address = place.formatted_address
-      this.activeLocation = place.formatted_address
+      this.showClassifier = true;
+      this.lat = place.geometry.location.lat();
+      this.lng = place.geometry.location.lng();
 
-      this.showClassifier = true
-      this.lat = place.geometry.location.lat()
-      this.lng = place.geometry.location.lng()
-      this.showUserLocationOnTheMap(place.geometry.location.lat(), place.geometry.location.lng())
+      this.stateMapStore.finalPosition.lat = this.lat;
+      this.stateMapStore.finalPosition.lng = this.lng;
 
-    })
-    this.getMyLocation()
-  }
-}
+      await this.showUserLocationOnTheMap(
+        place.geometry.location.lat(),
+        place.geometry.location.lng()
+      );
+      this.getDistance();
+    });
+    this.getMyLocation();
+  },
+};
 </script>
 
 <style lang="scss">
@@ -324,23 +491,19 @@ export default {
 }
 
 .pac-item-query {
-
   font-size: 13px;
 }
 
 .pac-container {
-
   padding-left: 2px;
   padding-right: 2px;
   margin-left: 2px;
   margin-right: 2px;
-
 
   width: inherit;
   width: initial;
   width: revert;
   width: revert-layer;
   width: unset;
-
 }
 </style>
