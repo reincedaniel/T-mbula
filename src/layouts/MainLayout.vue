@@ -204,7 +204,7 @@
     >
       <!-- drawer content -->
 
-      <q-scroll-area v-if="visited" class="fit">
+      <q-scroll-area v-show="visited" class="fit">
         <q-toolbar class="bg-green shadow-1 sticky">
           <span class="text-caption text-white text-bold"
             ><span>Pontos Classificados</span></span
@@ -221,19 +221,19 @@
         </q-toolbar>
         <q-list>
           <q-item-label header></q-item-label>
-          <template v-for="(menuItem, index) in listVisitedPlaces" :key="index">
+          <template v-for="(menuItem, index) in visitedPlaces" :key="index">
             <q-item clickable v-ripple @click="getThePOI(menuItem)">
               <q-item-section top avatar>
                 <q-avatar square size="40px" rounded>
                   <img
-                    :src="menuItem.raw.photoURL"
+                    :src="menuItem?.raw?.photoURL || '149071.png'"
                     style="border-radius: 20%"
                   />
                 </q-avatar>
               </q-item-section>
 
               <q-item-section>
-                <q-item-label>{{ capitalize(menuItem.fullName) }}</q-item-label>
+                <q-item-label>{{ menuItem.fullName }}</q-item-label>
                 <q-item-label caption
                   ><span class="text-bold text-blue-5">Endereço:</span>
                   {{ menuItem?.address }}</q-item-label
@@ -257,7 +257,7 @@
         </q-list>
       </q-scroll-area>
 
-      <q-scroll-area v-else class="fit">
+      <q-scroll-area v-show="!visited" class="fit">
         <q-toolbar class="bg-blue-5 shadow-1 sticky">
           <span class="text-caption text-white text-bold"
             ><span>Lista dos Pontos de Interesses No raio de 5 Km</span></span
@@ -429,8 +429,8 @@ export default {
     async fetchPlaces() {
       try {
         const response = await api.getPlaces();
-        this.visitedPlaces = response && response.data;
-        console.log("visitedPlaces:: > ", this.visitedPlaces);
+        this.visitedPlaces = (response && response.data) || [];
+        // console.log("visitedPlaces:: > ", this.visitedPlaces);
       } catch (error) {
         console.error(error);
       }
@@ -597,7 +597,6 @@ export default {
         });
     },
   },
-
   mounted() {
     this.leftDrawerOpen = false;
     /*   this.isLogged = !!localStorage.getItem("userLogged") */
