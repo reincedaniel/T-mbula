@@ -49,6 +49,7 @@
             () => {
               rightDrawerOpen = true;
               visited = true;
+              fetchPlaces();
             }
           "
         >
