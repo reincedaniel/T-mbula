@@ -190,6 +190,7 @@
 </template>
 
 <script>
+import { uuid } from "vue-uuid";
 import {
   GeoPoint,
   getFirestore,
@@ -244,6 +245,7 @@ export default {
   methods: {
     async sendClassifier() {
       const dataObject = {
+        _id: uuid.v1(),
         date: Date.now(),
         address: this.activeLocation,
         comment: this.comment,
