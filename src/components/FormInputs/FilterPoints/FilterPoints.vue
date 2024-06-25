@@ -206,10 +206,12 @@ import {
 import useMapStore from "src/stores/MapStore";
 import { storeToRefs } from "pinia";
 import hermes from "src/composables/hermes";
+import api from "src/services/api";
 
 export default {
   data() {
     return {
+      visitedPlaces: [],
       userLogged: null,
       estimatedTime: "",
       db: getFirestore(this.$firebaseApp),
@@ -234,10 +236,12 @@ export default {
       defaultCoords: { lat: 40.20564, lng: -8.41955 },
     };
   },
-  methods: {
-    alertx(val) {
-      alert(val);
+  computed: {
+    listVisitedPlaces() {
+      return this.visitedPlaces;
     },
+  },
+  methods: {
     async sendClassifier() {
       const dataObject = {
         date: Date.now(),
@@ -249,14 +253,15 @@ export default {
         rate: this.ratingModel,
         userId: this.userLogged?.uid,
         geoPoint: new GeoPoint(this.lat, this.lng),
+        raw: this.userLogged,
       };
 
       console.log("dataObject::>  ", dataObject);
       console.log("this.db::>  ", this.db);
 
       try {
-        await addDoc(collection(this.db, "placesVisited"), dataObject);
-
+        // await addDoc(collection(this.db, "placesVisited"), dataObject);
+        const response = await api.addPlace(dataObject);
         this.$q.notify({
           position: "bottom",
           progress: true,
@@ -269,6 +274,7 @@ export default {
 
         this.comment = null;
         this.ratingModel = null;
+        this.fetchPlaces();
       } catch (error) {
         this.$q.notify({
           position: "bottom",
@@ -435,6 +441,15 @@ export default {
         );
       });
     },
+    async fetchPlaces() {
+      try {
+        const response = await api.getPlaces();
+        this.visitedPlaces = response;
+        console.log("visitedPlaces:: > ", this.visitedPlaces);
+      } catch (error) {
+        console.error(error);
+      }
+    },
   },
   mounted() {
     if (this.mapStore.isLogged) {
@@ -468,6 +483,7 @@ export default {
       this.getDistance();
     });
     this.getMyLocation();
+    this.fetchPlaces();
   },
 };
 </script>
