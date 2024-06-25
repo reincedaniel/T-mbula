@@ -246,6 +246,7 @@ export default {
   },
   methods: {
     async sendClassifier() {
+      this.userLogged = JSON.parse(localStorage.getItem("userLogged") || {});
       const dataObject = {
         _id: uuid.v1(),
         date: Date.now(),
