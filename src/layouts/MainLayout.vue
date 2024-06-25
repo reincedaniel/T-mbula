@@ -38,6 +38,23 @@
           @click="toggleLeftDrawer"
         />
         <q-btn
+          v-if="mapStore.isLogged"
+          class="q-mx-md"
+          flat
+          dense
+          round
+          icon="pin_drop"
+          aria-label="pin_drop"
+          @click="
+            () => {
+              rightDrawerOpen = true;
+              visited = true;
+            }
+          "
+        >
+          <q-tooltip> Pontos Classificados </q-tooltip>
+        </q-btn>
+        <q-btn
           flat
           dense
           round
@@ -47,7 +64,12 @@
               : 'eva-paper-plane-outline'
           "
           aria-label="Menu"
-          @click="toggleRightDrawer"
+          @click="
+            () => {
+              rightDrawerOpen = true;
+              visited = false;
+            }
+          "
         >
           <q-tooltip> Pontos de Interesse </q-tooltip>
         </q-btn>
@@ -181,9 +203,62 @@
     >
       <!-- drawer content -->
 
-      <q-scroll-area v-if="true" class="fit">
-        <q-toolbar class="bg-white shadow-1 sticky">
-          <span class="text-caption text-grey-8 text-bold"
+      <q-scroll-area v-if="visited" class="fit">
+        <q-toolbar class="bg-green shadow-1 sticky">
+          <span class="text-caption text-white text-bold"
+            ><span>Pontos Classificados</span></span
+          >
+          <q-space></q-space>
+          <q-btn
+            color="grey-9"
+            size="8px"
+            class="q-ml-md"
+            round
+            icon="close"
+            @click="rightDrawerOpen = false"
+          />
+        </q-toolbar>
+        <q-list>
+          <q-item-label header></q-item-label>
+          <template v-for="(menuItem, index) in listVisitedPlaces" :key="index">
+            <q-item clickable v-ripple @click="getThePOI(menuItem)">
+              <q-item-section top avatar>
+                <q-avatar square size="40px" rounded>
+                  <img
+                    :src="menuItem.raw.photoURL"
+                    style="border-radius: 20%"
+                  />
+                </q-avatar>
+              </q-item-section>
+
+              <q-item-section>
+                <q-item-label>{{ capitalize(menuItem.fullName) }}</q-item-label>
+                <q-item-label caption
+                  ><span class="text-bold text-blue-5">Endereço:</span>
+                  {{ menuItem?.address }}</q-item-label
+                >
+                <q-item-label caption
+                  ><span class="text-bold text-blue-5">Comentário :</span>
+                  {{ menuItem?.comment }}</q-item-label
+                >
+              </q-item-section>
+
+              <q-item-section side top>
+                <q-badge
+                  :color="getTheRateColor(menuItem.rate)"
+                  :label="menuItem.rate"
+                />
+              </q-item-section>
+            </q-item>
+
+            <q-separator :key="'sep' + index" v-if="menuItem.separator" />
+          </template>
+        </q-list>
+      </q-scroll-area>
+
+      <q-scroll-area v-else class="fit">
+        <q-toolbar class="bg-blue-5 shadow-1 sticky">
+          <span class="text-caption text-white text-bold"
             ><span>Lista dos Pontos de Interesses No raio de 5 Km</span></span
           >
           <q-space></q-space>
@@ -321,7 +396,7 @@ import { format } from "quasar";
 import { storeToRefs } from "pinia";
 import hermes from "src/composables/hermes";
 // destructuring to keep only what is needed
-
+import api from "src/services/api";
 const { capitalize, humanStorageSize } = format;
 
 export default {
@@ -330,6 +405,7 @@ export default {
   data() {
     return {
       estimatedTime: "",
+      visited: false,
       capitalize,
       humanStorageSize,
       toLogout: false,
@@ -343,7 +419,21 @@ export default {
       rightDrawerOpen: true,
     };
   },
+  computed: {
+    listVisitedPlaces() {
+      return this.visitedPlaces || [];
+    },
+  },
   methods: {
+    async fetchPlaces() {
+      try {
+        const response = await api.getPlaces();
+        this.visitedPlaces = response && response.data;
+        console.log("visitedPlaces:: > ", this.visitedPlaces);
+      } catch (error) {
+        console.error(error);
+      }
+    },
     getDistance() {
       hermes.send("change-updates-2", { getDistance: "Outras Coisas" }, "all");
     },
@@ -430,9 +520,11 @@ export default {
     },
     getThePOI(payload) {
       const data = JSON.parse(JSON.stringify(payload));
-      const { lat = 0, lng = 0 } = data?.geometry?.location;
-      console.log(data);
-      this.stateMapStore.address = data && data.name;
+      const { lat = 0, lng = 0 } = this.visited
+        ? data
+        : data?.geometry?.location;
+      const name = this.visited ? data.address : data.name;
+      this.stateMapStore.address = name;
       this.stateMapStore.finalPosition.lat = lat;
       this.stateMapStore.finalPosition.lng = lng;
       this.showUserLocationOnTheMap(lat, lng);
@@ -512,6 +604,8 @@ export default {
       this.userLogged = JSON.parse(localStorage.getItem("userLogged") || {});
     }
     this.$q.platform.is.desktop ? "" : (this.rightDrawerOpen = false);
+
+    this.fetchPlaces();
   },
 };
 </script>

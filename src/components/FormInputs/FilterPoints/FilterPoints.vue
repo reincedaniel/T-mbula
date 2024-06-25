@@ -485,7 +485,7 @@ export default {
       this.getDistance();
     });
     this.getMyLocation();
-    this.fetchPlaces();
+    // this.fetchPlaces();
   },
 };
 </script>
